@@ -1,10 +1,8 @@
-import axios from 'axios';
 import cookies from 'js-cookie';
-import RootService from './root.service';
-class UserService extends RootService {
-  constructor(endPoint: string) {
-    super(endPoint);
-  }
+import { service } from '../../types/common';
+import BaseService from './base.service';
+class UserService extends BaseService {
+  private readonly service: service = 'users';
 
   async me() {
     const accessToken = cookies.get('accessToken');
@@ -12,18 +10,21 @@ class UserService extends RootService {
       return;
     }
 
-    const { data } = await axios.get(this.BASE_URL + 'me', {
-      headers: this.getCommonHeader(accessToken),
+    const { data } = await this.requestGet({
+      endPoint: `${this.service}/me`,
+      config: {
+        headers: this.getCommonHeader(accessToken),
+      },
     });
 
     return data;
   }
 
   async read(id: number) {
-    const { data } = await axios.get(this.BASE_URL + id);
+    const { data } = await this.requestGet({ endPoint: `${this.service}/${id}` });
 
     return data;
   }
 }
 
-export default new UserService('/users/');
+export default new UserService();

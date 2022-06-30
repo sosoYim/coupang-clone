@@ -1,6 +1,7 @@
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import cookies from 'js-cookie';
-import RootService from './root.service';
+import { service } from '../../types/common';
+import BaseService from './base.service';
 
 type SignupAgreements = {
   privacy: boolean;
@@ -18,11 +19,12 @@ type EXPIRES_Type = {
   REFRESH: number;
 };
 
-class AuthService extends RootService {
+class AuthService extends BaseService {
   private EXPIRES: EXPIRES_Type;
+  private readonly service: service = 'auth';
 
-  constructor(endPoint: string) {
-    super(endPoint);
+  constructor() {
+    super();
     this.EXPIRES = { ACCESS: 1, REFRESH: 7 };
   }
 
@@ -38,8 +40,12 @@ class AuthService extends RootService {
       return;
     }
 
-    const { data } = await axios.get(this.BASE_URL + 'refresh', {
-      headers: this.getCommonHeader(refreshToken),
+    const { data } = await this.requestPost({
+      endPoint: `${this.service}/refresh/`,
+      payload: null,
+      config: {
+        headers: this.getCommonHeader(refreshToken),
+      },
     });
 
     this.setCookies(data);
@@ -53,12 +59,15 @@ class AuthService extends RootService {
     phoneNumber: string,
     agreements: SignupAgreements
   ) {
-    const { data } = await axios.post(this.BASE_URL + 'signup', {
-      email,
-      password,
-      name,
-      phoneNumber,
-      agreements,
+    const { data } = await this.requestPost({
+      endPoint: `${this.service}/` + 'signup',
+      payload: {
+        email,
+        password,
+        name,
+        phoneNumber,
+        agreements,
+      },
     });
 
     this.setCookies(data);
@@ -66,13 +75,16 @@ class AuthService extends RootService {
 
   /** 이미 생성된 계정의 토큰을 발급받습니다. */
   async login(email: string, password: string) {
-    const { data } = await axios.post(this.BASE_URL + 'login', {
-      email,
-      password,
+    const { data } = await this.requestPost({
+      endPoint: `${this.service}/` + 'login',
+      payload: {
+        email,
+        password,
+      },
     });
 
     this.setCookies(data);
   }
 }
 
-export default new AuthService('/auth/');
+export default new AuthService();
