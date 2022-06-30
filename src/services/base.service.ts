@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
 type RequestType<T> = {
   endPoint: string;
@@ -26,6 +26,11 @@ abstract class BaseService {
 
   getCommonHeader(token: string) {
     return { Authorization: `Bearer ${token}` };
+  }
+
+  handleError(error: AxiosError) {
+    console.error(error);
+    throw new Error();
   }
 }
 

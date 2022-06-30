@@ -1,12 +1,12 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import Image from 'next/image';
-import { useRequest } from '../src/hooks';
+import { useGetUserMe } from '../src/hooks';
 
 import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
-  const { data: me, isFetching } = useRequest();
+  const { data: me, isFetching } = useGetUserMe();
 
   !isFetching && console.log('내 정보입니다', me);
 
